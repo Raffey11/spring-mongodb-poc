@@ -1,9 +1,9 @@
 package com.example.springmongodbpoc.controller;
 
 import com.example.springmongodbpoc.ProfilePojo;
-import com.example.springmongodbpoc.client.MongodbSaveUserClient;
 import com.example.springmongodbpoc.model.entities.Profile;
-import com.example.springmongodbpoc.model.repos.ProfileRepository;
+import com.example.springmongodbpoc.model.repos.primary.PrimaryProfileRepository;
+import com.example.springmongodbpoc.model.repos.secondary.SecondaryProfileRepository;
 import com.example.springmongodbpoc.model.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,26 +17,24 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProfileController {
 
-    private final ProfileRepository profileRepo;
+    private final PrimaryProfileRepository primaryProfileRepository;
+    private final SecondaryProfileRepository secondaryProfileRepository;
     private final ProfileService profileService;
-    private final MongodbSaveUserClient client;
 
     @PostMapping("/get-user-profile/{fileName}")
     public void getUserProfile(@PathVariable("fileName") String fileName) throws Exception {
         List<String> userIds = readCSVFile(fileName);
-        Optional<Profile> userProfileOpt = profileRepo.findByUserId(userIds.get(0));
+        Optional<Profile> userProfileOpt = primaryProfileRepository.findByUserId(userIds.get(0));
         System.out.println(userProfileOpt);
-        if (userProfileOpt.isPresent()) {
-            Profile userProfile = userProfileOpt.get();
-            client.saveUserProfile(ProfilePojo.builder()
-                    .userId(userProfile.getUserId())
-                    .username(userProfile.getUsername())
-                    .usernames(userProfile.getUsernames())
-                    .identities(userProfile.getIdentities())
-                    .preferences(userProfile.getPreferences())
-                    .signupTimestamp(new Date())
-                    .build());
+        if (!userProfileOpt.isPresent()) {
+            return;
         }
+        Profile userProfile = userProfileOpt.get();
+        Optional<Profile> secondUserProfile = secondaryProfileRepository.findByUserId(userProfile.getUserId());
+        if (secondUserProfile.isPresent()) {
+            return;
+        }
+        secondaryProfileRepository.save(userProfile);
     }
 
     private List<String> readCSVFile(String fileName) {

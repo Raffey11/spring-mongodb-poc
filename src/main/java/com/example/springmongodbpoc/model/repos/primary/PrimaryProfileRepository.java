@@ -1,15 +1,13 @@
-package com.example.springmongodbpoc.model.repos;
+package com.example.springmongodbpoc.model.repos.primary;
 
 import com.example.springmongodbpoc.model.entities.Profile;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.ExistsQuery;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-public interface ProfileRepository extends MongoRepository<Profile, String> {
+public interface PrimaryProfileRepository extends MongoRepository<Profile, String> {
     Optional<Profile> findByUserId(String userId);
 
     Optional<Profile> findByUsername(String username);

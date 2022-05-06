@@ -1,9 +1,8 @@
 package com.example.springmongodbpoc.model.service;
 
 import com.example.springmongodbpoc.model.entities.Profile;
-import com.example.springmongodbpoc.model.repos.ProfileRepository;
+import com.example.springmongodbpoc.model.repos.primary.PrimaryProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,7 +11,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
-    private final ProfileRepository profileRepo;
+    private final PrimaryProfileRepository profileRepo;
 
     @Override
     public Optional<Profile> getProfileByUserId(String userId) {
